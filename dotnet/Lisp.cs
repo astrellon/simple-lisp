@@ -9,13 +9,13 @@ namespace DotnetLisp
         #endregion
 
         #region Methods
-        public static IValue Evaluate(string input, LispEnvironment env)
+        public static IValue Evaluate(string input, ILispEnvironment env)
         {
             var parsed = LispParser.ReadFromTokens(LispParser.Tokenize(input));
             return Evaluate(parsed, env);
         }
 
-        public static IValue Evaluate(IValue input, LispEnvironment env)
+        public static IValue Evaluate(IValue input, ILispEnvironment env)
         {
             if (input is SymbolValue symbolValue)
             {
@@ -73,9 +73,9 @@ namespace DotnetLisp
                         case "begin":
                             {
                                 IValue result = NullValue.Value;
-                                foreach (var item in arrayValue.Value)
+                                for (var i = 0; i < arrayValue.Value.Count; i++)
                                 {
-                                    result = Evaluate(item, env);
+                                    result = Evaluate(arrayValue.Value[i], env);
                                 }
                                 return result;
                             }
@@ -85,7 +85,11 @@ namespace DotnetLisp
                 var value = Evaluate(first, env);
                 if (value is IProcedure proc)
                 {
-                    var args = arrayValue.Value.Skip(1).Select(v => Evaluate(v, env)).ToList();
+                    var args = new IValue[arrayValue.Value.Count - 1];
+                    for (var i = 1; i < arrayValue.Value.Count; i++)
+                    {
+                        args[i - 1] = Evaluate(arrayValue.Value[i], env);
+                    }
                     return proc.Execute(new ArrayValue(args), env);
                 }
                 else

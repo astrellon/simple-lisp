@@ -22,7 +22,7 @@ namespace DotnetLisp
         #endregion
 
         #region Methods
-        public IValue Execute(ArrayValue input, LispEnvironment env)
+        public IValue Execute(ArrayValue input, ILispEnvironment env)
         {
             var newEnv = new LispEnvironment(env);
             for (var i = 0; i < input.Value.Count; i++)

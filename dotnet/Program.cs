@@ -13,15 +13,17 @@ namespace DotnetLisp
         #region Methods
         public static void Main(string[] args)
         {
-            var env = new LispEnvironment();
-            env.Set("isNotDone", IsNotDoneProc);
-            env.Set("addTotal", AddTotalProc);
-            env.Set("add", AddProc);
-            env.Set("rand", RandProc);
-            env.Set("done", DoneProc);
+            // var env = new LispEnvironment();
+            // env.Set("isNotDone", IsNotDoneProc);
+            // env.Set("addTotal", AddTotalProc);
+            // env.Set("add", AddProc);
+            // env.Set("rand", RandProc);
+            // env.Set("done", DoneProc);
+            var stdEnv = new StdLispEnvironment();
+            var env = new LispEnvironment(stdEnv);
 
             var sw = Stopwatch.StartNew();
-            Lisp.Evaluate(File.ReadAllText("perfTest.lisp"), env);
+            Lisp.Evaluate(File.ReadAllText("test.lisp"), env);
             sw.Stop();
             Console.WriteLine($"Time taken: {sw.ElapsedMilliseconds}ms");
         }

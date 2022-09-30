@@ -9,18 +9,18 @@ namespace DotnetLisp
         public bool IsNull => false;
         public object RawValue => this.Proc;
 
-        public readonly Func<ArrayValue, LispEnvironment, IValue> Proc;
+        public readonly Func<ArrayValue, ILispEnvironment, IValue> Proc;
         #endregion
 
         #region Constructor
-        public BuiltinProcedureValue(Func<ArrayValue, LispEnvironment, IValue> proc)
+        public BuiltinProcedureValue(Func<ArrayValue, ILispEnvironment, IValue> proc)
         {
             this.Proc = proc;
         }
         #endregion
 
         #region Methods
-        public IValue Execute(ArrayValue input, LispEnvironment env)
+        public IValue Execute(ArrayValue input, ILispEnvironment env)
         {
             return this.Proc.Invoke(input, env);
         }
