@@ -6,7 +6,7 @@ namespace DotnetLisp
     public class LispEnvironment : ILispEnvironment
     {
         #region Fields
-        private readonly Dictionary<string, IValue> data = new Dictionary<string, IValue>();
+        private readonly Dictionary<string, object> data = new Dictionary<string, object>();
         private readonly ILispEnvironment? parent;
         public bool IsReadOnly;
         #endregion
@@ -20,7 +20,7 @@ namespace DotnetLisp
         #endregion
 
         #region Methods
-        public void Set(string key, IValue value)
+        public void Set(string key, object value)
         {
             if (this.IsReadOnly)
             {
@@ -29,7 +29,7 @@ namespace DotnetLisp
             this.data[key] = value;
         }
 
-        public IValue Get(string key)
+        public object Get(string key)
         {
             if (this.data.TryGetValue(key, out var result))
             {
@@ -41,7 +41,7 @@ namespace DotnetLisp
                 return this.parent.Get(key);
             }
 
-            return NullValue.Value;
+            return null;
         }
         #endregion
     }

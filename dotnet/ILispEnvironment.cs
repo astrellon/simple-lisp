@@ -1,9 +1,10 @@
+using System;
+
 namespace DotnetLisp
 {
     public interface ILispEnvironment
     {
-        void Set(string key, IValue value);
-        IValue Get(string key);
-
+        void Set(string key, object value);
+        object Get(string key);
     }
 }

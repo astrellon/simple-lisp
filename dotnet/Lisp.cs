@@ -1,21 +1,23 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DotnetLisp
 {
+    using ArrayValue = List<object>;
     public static class Lisp
     {
         #region Fields
         #endregion
 
         #region Methods
-        public static IValue Evaluate(string input, ILispEnvironment env)
+        public static object Evaluate(string input, ILispEnvironment env)
         {
             var parsed = LispParser.ReadFromTokens(LispParser.Tokenize(input));
             return Evaluate(parsed, env);
         }
 
-        public static IValue Evaluate(IValue input, ILispEnvironment env)
+        public static object Evaluate(object input, ILispEnvironment env)
         {
             if (input is SymbolValue symbolValue)
             {
@@ -23,48 +25,48 @@ namespace DotnetLisp
             }
             else if (input is ArrayValue arrayValue)
             {
-                var first = arrayValue.Value[0];
+                var first = arrayValue[0];
                 if (first is SymbolValue firstSymbol)
                 {
                     switch (firstSymbol.Value)
                     {
                         case "lambda":
                             {
-                                var lambdaArgs = ((ArrayValue)arrayValue.Value[1]).Value.Select(v => (SymbolValue)v).ToList();
-                                var body = arrayValue.Value[2];
+                                var lambdaArgs = ((ArrayValue)arrayValue[1]).Select(v => (SymbolValue)v).ToList();
+                                var body = arrayValue[2];
                                 return new LambdaProcedureValue(lambdaArgs, body);
                             }
                         case "define":
                             {
-                                env.Set(arrayValue.Value[1].ToString(), Lisp.Evaluate(arrayValue.Value[2], env));
+                                env.Set(arrayValue[1].ToString(), Lisp.Evaluate(arrayValue[2], env));
                                 return input;
                             }
                         case "when":
                             {
-                                var test = arrayValue.Value[1];
-                                var body = arrayValue.Value[2];
-                                if (Evaluate(test, env).Equals(BoolValue.True))
+                                var test = arrayValue[1];
+                                var body = arrayValue[2];
+                                if (Evaluate(test, env).Equals(true))
                                 {
                                     return Evaluate(body, env);
                                 }
-                                return NullValue.Value;
+                                return null;
                             }
                         case "if":
                             {
-                                var test = arrayValue.Value[1];
-                                var ifTrue = arrayValue.Value[2];
-                                var ifFalse = arrayValue.Value[3];
-                                var compResult = Evaluate(test, env).Equals(BoolValue.True);
+                                var test = arrayValue[1];
+                                var ifTrue = arrayValue[2];
+                                var ifFalse = arrayValue[3];
+                                var compResult = Evaluate(test, env).Equals(true);
 
                                 return Evaluate(compResult ? ifTrue : ifFalse, env);
                             }
                         case "loop":
                             {
-                                var test = arrayValue.Value[1];
-                                var body = arrayValue.Value[2];
+                                var test = arrayValue[1];
+                                var body = arrayValue[2];
 
-                                IValue result = NullValue.Value;
-                                while (Evaluate(test, env).Equals(BoolValue.True))
+                                object result = null;
+                                while (Evaluate(test, env).Equals(true))
                                 {
                                     result = Evaluate(body, env);
                                 }
@@ -72,10 +74,10 @@ namespace DotnetLisp
                             }
                         case "begin":
                             {
-                                IValue result = NullValue.Value;
-                                for (var i = 0; i < arrayValue.Value.Count; i++)
+                                object result = null;
+                                for (var i = 0; i < arrayValue.Count; i++)
                                 {
-                                    result = Evaluate(arrayValue.Value[i], env);
+                                    result = Evaluate(arrayValue[i], env);
                                 }
                                 return result;
                             }
@@ -85,10 +87,10 @@ namespace DotnetLisp
                 var value = Evaluate(first, env);
                 if (value is IProcedure proc)
                 {
-                    var args = new IValue[arrayValue.Value.Count - 1];
-                    for (var i = 1; i < arrayValue.Value.Count; i++)
+                    var args = new object[arrayValue.Count - 1];
+                    for (var i = 1; i < arrayValue.Count; i++)
                     {
-                        args[i - 1] = Evaluate(arrayValue.Value[i], env);
+                        args[i - 1] = Evaluate(arrayValue[i], env);
                     }
                     return proc.Execute(new ArrayValue(args), env);
                 }

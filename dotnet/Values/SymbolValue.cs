@@ -4,12 +4,10 @@ using System;
 
 namespace DotnetLisp
 {
-    public struct SymbolValue : IValue
+    public struct SymbolValue
     {
         #region Fields
         public readonly string Value;
-        public object RawValue => this.Value;
-        public bool IsNull => false;
         #endregion
 
         #region Constructor
@@ -40,7 +38,7 @@ namespace DotnetLisp
             return HashCode.Combine(7, this.Value.GetHashCode());
         }
 
-        public int CompareTo(IValue? other)
+        public int CompareTo(object? other)
         {
             if (other == null) return 1;
             if (other is SymbolValue otherSymbol)

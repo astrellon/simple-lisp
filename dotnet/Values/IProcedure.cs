@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
+
 namespace DotnetLisp
 {
     public interface IProcedure
     {
-        IValue Execute(ArrayValue input, ILispEnvironment env);
+        object Execute(List<object> input, ILispEnvironment env);
     }
 }

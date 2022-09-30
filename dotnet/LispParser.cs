@@ -21,7 +21,7 @@ namespace DotnetLisp
             return TokenRegex.Matches(cleaned).Select(m => m.Value).ToList();
         }
 
-        public static IValue ReadFromTokens(List<string> tokens)
+        public static object ReadFromTokens(List<string> tokens)
         {
             if (tokens.Count == 0)
             {
@@ -31,13 +31,13 @@ namespace DotnetLisp
             var token = tokens.PopFront();
             if (token == "(")
             {
-                var list = new List<IValue>();
+                var list = new List<object>();
                 while (tokens.First() != ")")
                 {
                     list.Add(ReadFromTokens(tokens));
                 }
                 tokens.PopFront();
-                return new ArrayValue(list);
+                return new List<object>(list);
             }
             else if (token == ")")
             {
@@ -49,24 +49,24 @@ namespace DotnetLisp
             }
         }
 
-        public static IValue Atom(string input)
+        public static object Atom(string input)
         {
             if (input.Length == 0)
             {
-                return NullValue.Value;
+                return null;
             }
 
             if (double.TryParse(input, out var number))
             {
-                return new NumberValue(number);
+                return number;
             }
             if (bool.TryParse(input, out var boolean))
             {
-                return new BoolValue(boolean);
+                return boolean;
             }
             if (input.First() == '"' && input.Last() == '"')
             {
-                return new StringValue(input.Substring(1, input.Length - 2));
+                return input.Substring(1, input.Length - 2);
             }
             return new SymbolValue(input);
         }

@@ -1,34 +1,25 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace DotnetLisp
 {
-    public class BuiltinProcedureValue : IValue, IProcedure
+    public class BuiltinProcedureValue : IProcedure
     {
         #region Fields
-        public bool IsNull => false;
-        public object RawValue => this.Proc;
-
-        public readonly Func<ArrayValue, ILispEnvironment, IValue> Proc;
+        public readonly Func<List<object>, ILispEnvironment, object> Proc;
         #endregion
 
         #region Constructor
-        public BuiltinProcedureValue(Func<ArrayValue, ILispEnvironment, IValue> proc)
+        public BuiltinProcedureValue(Func<List<object>, ILispEnvironment, object> proc)
         {
             this.Proc = proc;
         }
         #endregion
 
         #region Methods
-        public IValue Execute(ArrayValue input, ILispEnvironment env)
+        public object Execute(List<object> input, ILispEnvironment env)
         {
             return this.Proc.Invoke(input, env);
-        }
-
-        public int CompareTo(IValue? other)
-        {
-            if (other == null || !(other is BuiltinProcedureValue otherBuiltin)) return -1;
-            return this.Proc == otherBuiltin.Proc ? 0 : 1;
         }
 
         public override string ToString()
@@ -39,6 +30,12 @@ namespace DotnetLisp
         public override int GetHashCode()
         {
             return this.Proc.GetHashCode();
+        }
+
+        public int CompareTo(object? other)
+        {
+            if (other == null || !(other is BuiltinProcedureValue otherBuiltin)) return -1;
+            return this.Proc == otherBuiltin.Proc ? 0 : 1;
         }
         #endregion
     }

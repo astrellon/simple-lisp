@@ -8,66 +8,78 @@ namespace DotnetLisp
         #region Fields
         private static readonly Random RandomGen = new Random();
 
-        private static readonly IValue Print = new BuiltinProcedureValue((input, env) =>
+        private static readonly object Print = new BuiltinProcedureValue((input, env) =>
         {
-            Console.WriteLine(string.Join("", input.Value.Select(v => v.ToString())));
-            return input.Value[0];
+            Console.WriteLine(string.Join("", input.Select(v => v.ToString())));
+            return input[0];
         });
 
-        private static readonly IValue Rand = new BuiltinProcedureValue((input, env) =>
+        private static readonly object Rand = new BuiltinProcedureValue((input, env) =>
         {
-            return new NumberValue(RandomGen.NextDouble());
+            return RandomGen.NextDouble();
         });
 
-        private static readonly IValue Add = new BuiltinProcedureValue((input, env) =>
+        private static readonly object Add = new BuiltinProcedureValue((input, env) =>
         {
-            var result = ((NumberValue)input.Value.First()).Value;
-            for (var i = 1; i < input.Value.Count; i++)
+            var result = (double)(input.First());
+            for (var i = 1; i < input.Count; i++)
             {
-                result += ((NumberValue)input.Value[i]).Value;
+                result += (double)input[i];
             }
-            return new NumberValue(result);
+            return result;
         });
 
-        private static readonly IValue Sub = new BuiltinProcedureValue((input, env) =>
+        private static readonly object Sub = new BuiltinProcedureValue((input, env) =>
         {
-            var result = ((NumberValue)input.Value.First()).Value;
-            for (var i = 1; i < input.Value.Count; i++)
+            var result = (double)input.First();
+            for (var i = 1; i < input.Count; i++)
             {
-                result -= ((NumberValue)input.Value[i]).Value;
+                result -= (double)input[i];
             }
-            return new NumberValue(result);
+            return result;
         });
 
-        private static readonly IValue GreaterThan = new BuiltinProcedureValue((input, env) =>
+        private static readonly object GreaterThan = new BuiltinProcedureValue((input, env) =>
         {
-            var left = input.Value[0];
-            var right = input.Value[1];
-            return new BoolValue(left.CompareTo(right) > 0);
+            var left = input[0];
+            var right = input[1];
+            if (left is IComparable leftComp)
+            {
+                return leftComp.CompareTo(right) > 0;
+            }
+            return 1;
         });
 
-        private static readonly IValue LessThan = new BuiltinProcedureValue((input, env) =>
+        private static readonly object LessThan = new BuiltinProcedureValue((input, env) =>
         {
-            var left = input.Value[0];
-            var right = input.Value[1];
-            return new BoolValue(left.CompareTo(right) < 0);
+            var left = input[0];
+            var right = input[1];
+            if (left is IComparable leftComp)
+            {
+                return leftComp.CompareTo(right) < 0;
+            }
+            return 1;
         });
 
-        private static readonly IValue ValueEquals = new BuiltinProcedureValue((input, env) =>
+        private static readonly object ValueEquals = new BuiltinProcedureValue((input, env) =>
         {
-            var left = input.Value[0];
-            var right = input.Value[1];
-            return new BoolValue(left.CompareTo(right) == 0);
+            var left = input[0];
+            var right = input[1];
+            if (left is IComparable leftComp)
+            {
+                return leftComp.CompareTo(right) == 0;
+            }
+            return 1;
         });
         #endregion
 
         #region Methods
-        public void Set(string key, IValue value)
+        public void Set(string key, object value)
         {
             throw new Exception("READONLY");
         }
 
-        public IValue Get(string key)
+        public object Get(string key)
         {
             switch (key)
             {
@@ -85,7 +97,7 @@ namespace DotnetLisp
                 case "=": return ValueEquals;
             }
 
-            return NullValue.Value;
+            return null;
         }
 
         #endregion
